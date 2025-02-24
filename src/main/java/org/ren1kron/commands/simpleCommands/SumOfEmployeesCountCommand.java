@@ -2,13 +2,14 @@ package org.ren1kron.commands.simpleCommands;
 
 import org.ren1kron.commands.Command;
 import org.ren1kron.managers.CollectionManager;
+import org.ren1kron.managers.CommandManager;
 import org.ren1kron.module.Organization;
 import org.ren1kron.utils.ExecStatus;
 
-public class SumOfEmployeesCommand extends Command {
+public class SumOfEmployeesCountCommand extends Command {
     private final CollectionManager collectionManager = CollectionManager.getInstance();
-    public SumOfEmployeesCommand() {
-        super("sum", "Выводит в стандартный поток вывода информацию о коллекции", false);
+    public SumOfEmployeesCountCommand() {
+        super("sum_of_employees_count", "Выводит сумму значений поля employeesCount для всех элементов коллекции", false);
     }
 
     @Override
@@ -18,29 +19,22 @@ public class SumOfEmployeesCommand extends Command {
         }
 
 
+        StringBuilder sb = new StringBuilder();
+
         String HEADER_COLOR = "\u001B[34m"; // Синий цвет заголовка
         String RESET        = "\u001B[0m";  // Сброс цвета
         String RED          = "\u001B[31m"; // Красный цвет
 
-        String initTime = (collectionManager.getLastInitTime() == null)
-                ? RED + "Коллекция ещё не была инициализирована                      " + RESET
-                : "Дата: " + collectionManager.getLastInitTime().toLocalDate() + " | Время: " + collectionManager.getLastInitTime().toLocalTime();
 
-        String saveTime = (collectionManager.getLastSaveTime() == null)
-                ? RED + "Коллекция ещё не была сохранена                             " + RESET
-                : "Дата: " + collectionManager.getLastSaveTime().toLocalDate() + " | Время: " + collectionManager.getLastSaveTime().toLocalTime();
+        int sum = 0;
+        for (Organization org : collectionManager) {
+            sum += org.getEmployeesCount();
+        }
 
-        StringBuilder sb = new StringBuilder();
+        sb.append("┌─────────────────────────────────────────────┐\n");
+        sb.append(String.format("│ " + HEADER_COLOR + "%s:" +RED+ " %-11d" + RESET + " │%n", "Сумма работников всех компаний", sum));
 
-
-        sb.append("┌──────────────────────────────┬──────────────────────────────────────────────────────────────┐\n");
-        sb.append(String.format("│ " + HEADER_COLOR + "%-28s" + RESET + " │ " + HEADER_COLOR + "%-61s" + RESET + "│%n", "Атрибут", "Значение"));
-        sb.append("├──────────────────────────────┼──────────────────────────────────────────────────────────────┤\n");
-        sb.append(String.format("│ %-28s │ %-60s │%n", "Тип коллекции", collectionManager.getCollection().getClass().getSimpleName()));
-        sb.append(String.format("│ %-28s │ %-60s │%n", "Время инициализации", initTime));
-        sb.append(String.format("│ %-28s │ %-60s │%n", "Время сохранения", saveTime));
-        sb.append(String.format("│ %-28s │ %-60d │%n", "Элементов в коллекции", collectionManager.getCollection().size()));
-        sb.append("└──────────────────────────────┴──────────────────────────────────────────────────────────────┘\n");
+        sb.append("└─────────────────────────────────────────────┘\n");
 
         return new ExecStatus(sb.toString());
     }

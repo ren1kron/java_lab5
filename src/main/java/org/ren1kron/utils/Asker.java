@@ -1,6 +1,7 @@
 package org.ren1kron.utils;
 
 import jdk.jshell.Snippet;
+import lombok.Setter;
 import org.ren1kron.exceptions.ExitException;
 import org.ren1kron.managers.CollectionManager;
 import org.ren1kron.module.*;
@@ -12,10 +13,12 @@ import java.time.LocalDateTime;
  * Этот класс создаёт экземпляр организации из данных, введённых пользователем
  */
 public class Asker {
+    private final CollectionManager collectionManager = CollectionManager.getInstance();
+    private Console console;
 
-
-    private static final CollectionManager collectionManager = CollectionManager.getInstance();
-    private static Console console;
+    public Asker(Console console) {
+        this.console = console;
+    }
 
 //    private long id;                                //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
 //    private String name;                            //Поле не может быть null, Строка не может быть пустой
@@ -26,7 +29,7 @@ public class Asker {
 //    private Integer employeesCount;                 //Поле может быть null, Значение поля должно быть больше 0
 //    private OrganizationType type;                  //Поле может быть null
 //    private Address postalAddress;                  //Поле не может быть null
-    public static Organization askOrganization(Console console) throws ExitException {
+    public Organization askOrganization() throws ExitException {
         console.println("Для выполнения команды требуется ввести информацию об Организации");
         console.println("* введите 'exit' для отмены операции *");
             long id = collectionManager.getFreeId();                                //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
@@ -42,7 +45,7 @@ public class Asker {
     }
 
 
-    private static String askOrgName() throws ExitException {
+    private String askOrgName() throws ExitException {
         String name;
         do {
             console.print("Введите название Организации: ");
@@ -52,12 +55,12 @@ public class Asker {
         } while (name.isEmpty());
         return name;
     }
-    private static Coordinates askCoordinates(String name) throws ExitException {
+    private Coordinates askCoordinates(String name) throws ExitException {
 //        Integer x; //Максимальное значение поля: 59, Поле не может быть null
 //        Double y; //Максимальное значение поля: 115, Поле не может быть null
         Integer x = null;
         do {
-            console.print(String.format("Введите координаты \"x\" Организации '%s': ", name));
+            console.print(String.format("Введите координаты \"x\" Организации '%s' (максимальное значение: 59): ", name));
             String line = console.readln().trim();
 
             if (line.equalsIgnoreCase("exit"))
@@ -77,7 +80,7 @@ public class Asker {
         } while (x==null);
         Double y = null;
         do {
-            console.print("Введите значение координаты \"y\": ");
+            console.print(String.format("Введите координаты \"y\" Организации '%s' (максимальное значение: 115): ", name));
             String line = console.readln().trim();
 
             if (line.equalsIgnoreCase("exit"))
@@ -87,7 +90,7 @@ public class Asker {
                 try {
                     y = Double.parseDouble(line);
                     if (y > 115) {
-                        x = null;
+                        y = null;
                         console.printerr("Данное значение не валидно! Попробуйте ещё раз.");
                     }
                 } catch (IllegalArgumentException e) {
@@ -97,10 +100,10 @@ public class Asker {
         } while (y==null);
         return new Coordinates(x, y);
     }
-    private static int askAnnualTurnover(String name) throws ExitException {
+    private int askAnnualTurnover(String name) throws ExitException {
         int value = 0;
         do {
-            console.print(String.format("Введите значение годового оборота Организации '%s' (нажмите ENTER, если не хотите его указывать): ", name));
+            console.print(String.format("Введите значение годового оборота Организации '%s': ", name));
             String line = console.readln().trim();
 
             if (line.equalsIgnoreCase("exit"))
@@ -119,20 +122,18 @@ public class Asker {
         } while (value <= 0);
         return value;
     }
-    private static String askFullName(String name) throws ExitException {
+    private String askFullName(String name) throws ExitException {
         String fullName;
-        do {
-            console.print(String.format("Введите Полное название Организации '%s': ", name));
+            console.print(String.format("Введите Полное название Организации '%s' (нажмите ENTER, если не хотите его указывать): ", name));
             fullName = console.readln().trim();
             if (fullName.equalsIgnoreCase("exit"))
                 throw new ExitException();
-        } while (fullName.isEmpty());
         return fullName;
     }
-    private static Integer askEmployeesCount(String name) throws ExitException {
+    private Integer askEmployeesCount(String name) throws ExitException {
         int value = 0;
         do {
-            console.print(String.format("Введите количество работников Организации '%s': ", name));
+            console.print(String.format("Введите количество работников Организации '%s' (нажмите ENTER, если не хотите его указывать): ", name));
             String line = console.readln().trim();
             if (line.equalsIgnoreCase("exit"))
                 throw new ExitException();
@@ -153,10 +154,13 @@ public class Asker {
         return value;
     }
 
-    private static OrganizationType askOrganizationType(String name) throws ExitException {
+    private OrganizationType askOrganizationType(String name) throws ExitException {
+//                COMMERCIAL,
+//                PUBLIC,
+//                OPEN_JOINT_STOCK_COMPANY
         OrganizationType value = null;
         do {
-            console.print(String.format("Введите тип Организации '%s': ", name));
+            console.print(String.format("Введите тип Организации '%s' (commercial, public, open joint stock company) (нажмите ENTER, если не хотите его указывать): ", name));
             String line = console.readln().trim();
             if (line.equalsIgnoreCase("exit"))
                 throw new ExitException();
@@ -164,7 +168,7 @@ public class Asker {
                 return null;
             else
                 try {
-                    value = OrganizationType.valueOf(line.toUpperCase());
+                    value = OrganizationType.valueOfLabel(line.toLowerCase());
                 } catch (IllegalArgumentException e) {
                     console.printerr("Данное значение не валидно! Попробуйте ещё раз!");
                 }
@@ -172,14 +176,14 @@ public class Asker {
         return value;
     }
 
-    private static Address askPostalAddress(String name) throws ExitException {
+    private Address askPostalAddress(String name) throws ExitException {
         String zipCode;
         do {
             console.print(String.format("Введите почтовый индекс Организации '%s' (минимум 4 символа): ", name));
             zipCode = console.readln().trim();
             if (zipCode.equalsIgnoreCase("exit"))
                 throw new ExitException();
-            else if (zipCode.length() < 4) {
+            else if (!zipCode.isEmpty() && zipCode.length() < 4) {
                 console.printerr("Данное значение не валидно! Попробуйте ещё раз!");
             }
         } while (zipCode.length() < 4);
@@ -187,7 +191,7 @@ public class Asker {
 
         return new Address(zipCode, location);
     }
-    private static Location askLocation(String name) throws ExitException {
+    private Location askLocation(String name) throws ExitException {
 //        Integer x; //Поле не может быть null
 //        long y;
 //        String name; //Поле может быть null
@@ -216,7 +220,7 @@ public class Asker {
         } while (x == null);
         long y;
         do {
-            console.print(String.format("Введите значение 'y' локации Организации '%s' (нажмите ENTER, если не хотите его указывать): ", name));
+            console.print(String.format("Введите значение 'y' локации Организации '%s': ", name));
             String line = console.readln().trim();
 
             if (line.equalsIgnoreCase("exit"))

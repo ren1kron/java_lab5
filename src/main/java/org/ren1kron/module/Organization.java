@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Organization implements Validatable, Serializable {
+public class Organization implements Validatable, Serializable, Comparable<Organization> {
     private long id;                                //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     @NonNull
     private String name;                            //Поле не может быть null, Строка не может быть пустой
@@ -28,6 +28,14 @@ public class Organization implements Validatable, Serializable {
 
     @Override
     public boolean validate() {
-        return false;
+        if (id <= 0) return false;
+        if (name.isEmpty()) return false;
+        if (annualTurnover <= 0) return false;
+        return employeesCount == null || employeesCount <= 0;
+    }
+
+    @Override
+    public int compareTo(Organization organization) {
+        return this.getAnnualTurnover() - organization.getAnnualTurnover();
     }
 }

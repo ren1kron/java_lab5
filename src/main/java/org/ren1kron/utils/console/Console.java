@@ -1,5 +1,7 @@
 package org.ren1kron.utils.console;
 
+import java.io.BufferedReader;
+
 public interface Console {
     void print(Object obj);
     void println(Object obj);
@@ -7,5 +9,6 @@ public interface Console {
     void printGritting(Object obj);
 
     String readln();
-    boolean hasNextLine();
+    void setReader(BufferedReader reader);
+    BufferedReader getReader();
 }

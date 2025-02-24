@@ -1,13 +1,23 @@
 package org.ren1kron.utils.console;
 
-import java.util.Scanner;
+import lombok.Getter;
+import lombok.Setter;
 
-public class StandardConsole implements Console{
+import java.io.BufferedReader;
+import java.io.IOException;
+
+@Getter
+@Setter
+public class StandardConsole implements Console {
     private static final String RESET = "\u001B[0m";
-    private static final String RED   = "\u001B[31m";
+    private static final String RED = "\u001B[31m";
     private static final String GREEN = "\u001B[32m";
 
-    private static final Scanner scanner = new Scanner(System.in);
+    private BufferedReader reader;
+
+    public StandardConsole(BufferedReader reader) {
+        this.reader = reader;
+    }
 
     @Override
     public void print(Object obj) {
@@ -31,11 +41,11 @@ public class StandardConsole implements Console{
 
     @Override
     public String readln() {
-        return scanner.nextLine();
-    }
-
-    @Override
-    public boolean hasNextLine() {
-        return scanner.hasNextLine();
+        try {
+            return reader.readLine();
+        } catch (IOException e) {
+            printerr("Ошибка чтения ввода: " + e.getMessage());
+            return "";
+        }
     }
 }

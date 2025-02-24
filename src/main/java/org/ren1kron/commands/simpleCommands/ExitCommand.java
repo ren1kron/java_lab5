@@ -7,7 +7,7 @@ import org.ren1kron.utils.ExecStatus;
 public class ExitCommand extends Command {
 
     public ExitCommand() {
-        super("exit", "Закрывает программу", false);
+        super("exit", "Закрывает программу без сохранения коллекции в файл", false);
     }
 
     @Override
