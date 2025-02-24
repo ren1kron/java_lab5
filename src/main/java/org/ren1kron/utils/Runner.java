@@ -9,6 +9,8 @@ import org.ren1kron.utils.console.Console;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -18,6 +20,7 @@ public class Runner {
     private final CommandManager commandManager = CommandManager.getInstance();
     private final Console console;
     private final Asker asker;
+    private final Map<String, Integer> scriptStack = new HashMap<>();
 
     public Runner(Console console) {
         this.console = console;
@@ -80,6 +83,7 @@ public class Runner {
      * Режим работы с файлами (чтение команд из скрипта)
      */
     private ExecStatus scriptMode(String filename) {
+        scriptStack.merge(filename, 1, Integer::sum); // считаем количество запусков всех файлов
         BufferedReader defaultReader = console.getReader();
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             console.setReader(reader);
@@ -91,6 +95,11 @@ public class Runner {
                     continue; // Пропускаем пустые строки
 
                 console.println("> " + line); // Показываем команду перед выполнением
+
+                if (tokens[0].equals("execute_script")) {
+                    if (scriptStack.get(filename) == 50)
+                        return new ExecStatus(false, "Достигнут предел рекурсии!");
+                }
 
                 ExecStatus execStatus = runCommand(tokens);
                 if (!execStatus.isOk())
@@ -108,6 +117,7 @@ public class Runner {
         }
         finally {
             console.setReader(defaultReader);
+            scriptStack.merge(filename, 0, (oldValue, newValue) -> oldValue - 1);
         }
     }
 }

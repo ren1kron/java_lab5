@@ -27,7 +27,7 @@ public class HistoryCommand extends Command {
         int i = 1;
         for (Command command : CommandManager.getHistory()) {
             sb.append("├─────────────────────────────────────────────┤\n");
-            sb.append(String.format("│ %d) %-40s │%n", i++, command.getName()));
+            sb.append(String.format("│ %-2d) %-39s │%n", i++, command.getName()));
         }
 
         sb.append("└─────────────────────────────────────────────┘\n");
