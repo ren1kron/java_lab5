@@ -28,7 +28,7 @@ public class SumOfEmployeesCountCommand extends Command {
 
         int sum = 0;
         for (Organization org : collectionManager) {
-            sum += org.getEmployeesCount();
+            sum += org.getEmployeesCount() == null ? 0 : org.getEmployeesCount();
         }
 
         sb.append("┌─────────────────────────────────────────────┐\n");

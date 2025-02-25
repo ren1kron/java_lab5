@@ -1,9 +1,5 @@
 package org.ren1kron;
 
-import org.ren1kron.managers.CollectionManager;
-import org.ren1kron.managers.CommandManager;
-import org.ren1kron.managers.DumpManager;
-import org.ren1kron.module.*;
 import org.ren1kron.utils.Runner;
 import org.ren1kron.utils.console.Console;
 import org.ren1kron.utils.console.StandardConsole;
@@ -23,35 +19,4 @@ public class Main {
 
         runner.interactiveMode();
     }
-
-//    // Создаем пример коллекции организаций
-//        List<Organization> organizations = new ArrayList<>();
-//        organizations.add(new Organization(
-//                1,
-//                "Organization One",
-//                new Coordinates(10, 20.0),
-//                LocalDateTime.now(),
-//                100000,
-//                "Full Name One",
-//                50,
-//                OrganizationType.PUBLIC,
-//                new Address("Street", new Location(1, 1, "LA"))
-//        ));
-//
-//        // Путь к файлу для сохранения JSON
-//        String filePath = "organizations.json";
-//
-//        try {
-//
-//
-//            // Загрузка коллекции из файла
-//            List<Organization> loadedOrganizations = DumpManager.loadOrganizations(filePath);
-//            System.out.println("Загружено организаций: " + loadedOrganizations.size());
-//
-//            // Сохранение коллекции в файл
-//            DumpManager.saveOrganizations(organizations, filePath);
-//            System.out.println("Сохранение успешно!");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
 }
